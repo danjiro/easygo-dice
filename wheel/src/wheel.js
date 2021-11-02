@@ -70,16 +70,18 @@ exports.spinWheel = ({ user, amount }) =>
 
 exports.getBets = async ({ user, limit, offset }) => {
   const bets = await knex('wheel_bet')
-    .where('user', user)
+    .where('wheel_bet.user', user)
+    .join('wheel_seed', 'wheel_seed.id', '=', 'wheel_bet.seed_id')
     .orderBy('wheel_bet.created_at', 'desc')
     .limit(limit)
     .offset(offset);
 
-  return bets;
+  return bets.map((bet) => _.omit(bet, ['secret']));
 };
 
 exports.getSeed = async ({ seedId }) => {
   const [seed] = await knex('wheel_seed').where('id', seedId);
+
   return parseSeed(seed);
 };
 

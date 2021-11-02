@@ -16,6 +16,7 @@ exports.Type = new GraphQLObjectType({
     payout: { type: GraphQLFloat },
     result: { type: GraphQLFloat },
     nonce: { type: GraphQLInt },
+    hash: { type: GraphQLString },
     user: {
       type: User.Type,
       resolve: ({ user }) => ({ name: user }),

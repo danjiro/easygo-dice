@@ -75,12 +75,13 @@ exports.rollDice = ({ user, amount, target }) =>
 
 exports.getBets = async ({ user, limit, offset }) => {
   const bets = await knex('bet')
-    .where('user', user)
+    .where('bet.user', user)
+    .join('seed', 'seed.id', '=', 'bet.seed_id')
     .orderBy('bet.created_at', 'desc')
     .limit(limit)
     .offset(offset);
 
-  return bets;
+  return bets.map((bet) => _.omit(bet, ['secret']));
 };
 
 exports.getSeed = async ({ seedId }) => {
