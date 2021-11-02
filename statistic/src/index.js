@@ -2,7 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { knex } = require('./knex');
 const { redis } = require('./redis');
-const { updateStatistic, getStatistic } = require('./statistic');
+const {
+  updateDiceStatistic,
+  updateWheelStatistic,
+  getStatistic,
+} = require('./statistic');
 
 const response = (handler) => async (req, res) => {
   try {
@@ -15,12 +19,14 @@ const response = (handler) => async (req, res) => {
 async function start() {
   await knex.migrate.latest();
 
-  redis.subscribe('dice');
+  redis.subscribe('dice', 'wheel');
   redis.on('message', async (channel, json) => {
     try {
       const data = JSON.parse(json);
       if (channel === 'dice') {
-        await updateStatistic(data);
+        await updateDiceStatistic(data);
+      } else if (channel === 'wheel') {
+        await updateWheelStatistic(data);
       }
     } catch (e) {
       // eslint-disable-next-line no-console

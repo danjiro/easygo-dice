@@ -20,6 +20,7 @@ exports.Type = new GraphQLObjectType({
         const { data } = await axios.post('http://statistic/get-statistic', {
           user,
         });
+
         return data;
       },
     },

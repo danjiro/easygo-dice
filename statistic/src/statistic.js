@@ -1,18 +1,40 @@
 const { v4: uuid } = require('uuid');
 const { knex } = require('./knex');
 
-exports.updateStatistic = async ({ user, amount, payout }) => {
+exports.updateDiceStatistic = async ({ user, amount, payout }) => {
   await knex.raw(
     `
-      insert into statistic (
+      insert into dice_statistic (
         "id", "user", "wagered", "profit"
       ) values (
         :id, :user, :wagered, :profit
       )
       on conflict ("user") do  update
       set 
-      wagered = statistic.wagered + :wagered,
-      profit = statistic.profit + :profit
+      wagered = dice_statistic.wagered + :wagered,
+      profit = dice_statistic.profit + :profit
+    `,
+    {
+      id: uuid(),
+      user,
+      wagered: amount,
+      profit: payout - amount,
+    }
+  );
+};
+
+exports.updateWheelStatistic = async ({ user, amount, payout }) => {
+  await knex.raw(
+    `
+      insert into wheel_statistic (
+        "id", "user", "wagered", "profit"
+      ) values (
+        :id, :user, :wagered, :profit
+      )
+      on conflict ("user") do  update
+      set
+      wagered = wheel_statistic.wagered + :wagered,
+      profit = wheel_statistic.profit + :profit
     `,
     {
       id: uuid(),
@@ -24,6 +46,8 @@ exports.updateStatistic = async ({ user, amount, payout }) => {
 };
 
 exports.getStatistic = async ({ user }) => {
-  const [statistic] = await knex('statistic').where('user', user);
-  return statistic;
+  const [diceStatistic] = await knex('dice_statistic').where('user', user);
+  const [wheelStatistic] = await knex('wheel_statistic').where('user', user);
+
+  return { diceStatistic, wheelStatistic };
 };
