@@ -1,3 +1,94 @@
+# How to run
+Same as the Get Started section below
+
+## Fix the Dice tests:
+`cd dice`
+`npm run test`
+
+or view commit `af9239c4498c24b439ae57753dc77f1d63a288ed`
+
+## Add a New Game:
+
+* Spin wheel
+  ```
+  mutation {
+    spinWheel(amount: 2) {
+      result
+      payout
+    }
+  }
+  ```
+* Get active wheel seed
+  ```
+  {
+    user {
+      activeWheelSeed {
+        secret
+        hash
+        nonce
+      }
+    }
+  }
+  ```
+* Rotate wheel seed (note: rotate seed for dice game actually doesn't work but fixed for wheel game)
+  ```
+  mutation {
+    rotateWheelSeed {
+      secret
+      hash
+    }
+  }
+  ```
+* Get list of wheel bets
+  ```
+  {
+    user {
+      name
+      wheelBets {
+        amount
+        result
+      }
+    }
+  }
+  ```
+
+## Add support for multiple games to the statistics service.
+
+```
+{
+  user {
+    name
+    statistic {
+      diceStatistic {
+        wagered
+        profit
+      }
+      wheelStatistic {
+        wagered
+        profit
+      }
+    }
+  }
+}
+```
+
+## Prevent multiple seed lookups
+I believe for this the seed lookup CAN be different for each bet if the user rotates their seed? Either way you can use a join on the bets select to reduce number of calls...
+```
+{
+  user {
+    diceBets {
+      result
+      hash
+    }
+    wheelBets {
+      result
+      hash
+    }
+  }
+}
+```
+
 # Casino Game Code Challenge
 You have been provided with a simple dice game app exposed through a graphql api. 
 The app uses cryptographic hashes to generate randomized outcomes to ensure the results are not rigged to favour the casino. 
