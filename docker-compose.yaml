@@ -50,4 +50,20 @@ services:
     environment:
     - POSTGRES_PASSWORD=password
 
+  wheel:
+    image: node:12-alpine
+    working_dir: /node
+    command: yarn start
+    volumes:
+    - ./wheel:/node
+    ports:
+    - 80
+    depends_on:
+    - redis
+    - wheel-postgres
+
+  wheel-postgres:
+    image: postgres:12-alpine
+    environment:
+    - POSTGRES_PASSWORD=password
 
